@@ -89,17 +89,13 @@
                         return;
                     }
 
-                    // Buscar el usuario en localStorage
-                    var usuarios = obtenerDeStorage(CLAVE_USUARIOS);
-                    if (usuarios === null || usuarios.length === 0) {
-                        // Cargar desde JSON si aún no se ha sincronizado
-                        cargarUsuarios().then(function(lista) {
-                            validarCredenciales(lista, usuario, password);
-                        });
-                        return;
-                    }
-
-                    validarCredenciales(usuarios, usuario, password);
+                    // Sincronizar y obtener la lista de usuarios más reciente
+                    cargarUsuarios().then(function(lista) {
+                        validarCredenciales(lista, usuario, password);
+                    }).catch(function() {
+                        var usuarios = obtenerDeStorage(CLAVE_USUARIOS) || [];
+                        validarCredenciales(usuarios, usuario, password);
+                    });
                 });
             }
 

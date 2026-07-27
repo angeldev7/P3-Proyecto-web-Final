@@ -6,7 +6,7 @@
  */
 
 // Versión de los datos para forzar refresco del caché en localStorage cuando se actualiza el JSON
-var VERSION_DATOS = "10.0";
+var VERSION_DATOS = "11.0";
 
 // Determinar la ruta relativa correcta del directorio json/ dependiendo de la página actual
 var RUTA_BASE_JSON = (window.location.pathname.indexOf("/pages/") !== -1) ? "../json/" : "json/";
@@ -46,6 +46,7 @@ function verificarVersionDatos() {
     if (versionGuardada !== VERSION_DATOS) {
         localStorage.removeItem(CLAVE_PRODUCTOS);
         localStorage.removeItem(CLAVE_CATEGORIAS);
+        localStorage.removeItem(CLAVE_USUARIOS);
         localStorage.setItem("fastmenu_version_datos", VERSION_DATOS);
     }
 }
@@ -113,10 +114,21 @@ function cargarCategorias() {
 // Cargar USUARIOS desde JSON o localStorage
 // ──────────────────────────────────────────────
 function cargarUsuarios() {
+    verificarVersionDatos();
+
     var usuariosGuardados = obtenerDeStorage(CLAVE_USUARIOS);
 
-    if (usuariosGuardados !== null && usuariosGuardados.length >= 50) {
-        return Promise.resolve(usuariosGuardados);
+    if (usuariosGuardados !== null && usuariosGuardados.length > 0) {
+        var tieneAdmin = false;
+        for (var u of usuariosGuardados) {
+            if (u.email === "admin@espe.edu.ec") {
+                tieneAdmin = true;
+                break;
+            }
+        }
+        if (tieneAdmin) {
+            return Promise.resolve(usuariosGuardados);
+        }
     }
 
     return fetch(RUTA_BASE_JSON + "usuarios.json")

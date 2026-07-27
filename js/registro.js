@@ -101,6 +101,13 @@ function manejarEnvioRegistro(evento) {
         }
     }
 
+    // Bloquear registro con correos administrativos reservadas
+    if (datosFormulario.email.toLowerCase().indexOf("admin@") !== -1) {
+        mostrarErrorCampo("email", "El correo admin está reservado para el administrador del sistema.");
+        mostrarNotificacion("No es posible registrar cuentas de administrador desde el formulario público.", "error");
+        return;
+    }
+
     if (yaExisteCedula) {
         mostrarErrorCampo("cedula", "Ya existe un usuario con esta cédula.");
         mostrarNotificacion("La cédula ya está registrada en el sistema.", "error");
@@ -117,7 +124,7 @@ function manejarEnvioRegistro(evento) {
     var nacValor = datosFormulario.nacionalidad || "🇪🇨 Ecuador";
     var objetoNacionalidad = { nombre: nacValor, codigoPais: "EC", bandera: nacValor.split(" ")[0] || "🇪🇨" };
 
-    // Crear el objeto del nuevo usuario
+    // Crear el objeto del nuevo usuario (ROLES PÚBLICOS: ESTRICTAMENTE ESTUDIANTE / NO ADMINISTRADOR)
     var nuevoUsuario = {
         id:              generarNuevoId(usuarios),
         nombres:         datosFormulario.nombres.trim(),
