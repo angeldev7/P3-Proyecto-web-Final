@@ -4,12 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FastMenu ESPE - Menú de comida universitaria. Pide tu almuerzo sin hacer filas en la ESPE sede Santo Domingo.">
     <title>Principal - FastMenu ESPE</title>
     <link rel="icon" type="image/x-icon" href="../imagenes/logo/iconos/Icono-FastMenu.ico">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Estilos propios -->
     <link rel="stylesheet" href="../css/general.css">
     <link rel="stylesheet" href="../css/principal.css">
+    <link rel="stylesheet" href="../css/indicadores.css">
 </head>
 
 <body>
@@ -22,8 +30,9 @@
     <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
         <div class="container-fluid justify-content-center">
             <span class="navbar-brand d-lg-none text-white fw-bold">FastMenu ESPE</span>
-            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
@@ -38,7 +47,13 @@
                         <a class="nav-link" href="#horarios"><i class="fas fa-clock"></i> Horarios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="pedido.html"><i class="fas fa-shopping-cart"></i> Mi pedido</a>
+                        <a class="nav-link" href="pedido.html">
+                            <i class="fas fa-shopping-cart"></i> Mi pedido
+                            <span class="contador-carrito" id="nav-contador-carrito" style="display:none;"></span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="catalogo.html"><i class="fas fa-cog"></i> Catálogo</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="nosotros.html"><i class="fas fa-users"></i> Nosotros</a>
@@ -47,14 +62,21 @@
                         <a class="nav-link" href="contacto.html"><i class="fas fa-envelope"></i> Contacto</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.html"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+                        <a class="nav-link" href="../index.html" id="btn-cerrar-sesion">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                        </a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+
     <main>
 
+        <!-- Saludo al usuario activo -->
+        <div id="saludo-usuario" class="saludo-usuario" style="display:none;"></div>
+
+        <!-- Sección de bienvenida y carrusel -->
         <div class="dashboard-header">
             <section id="bienvenida">
                 <h2>¡El mejor lugar para tus antojos!</h2>
@@ -64,16 +86,19 @@
             <aside class="promo-carousel-container p-0 overflow-hidden">
                 <div id="promoCarousel" class="carousel slide h-100" data-bs-ride="carousel">
                     <div class="carousel-indicators">
-                        <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                        <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                        <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                        <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0"
+                            class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1"
+                            aria-label="Slide 2"></button>
+                        <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="2"
+                            aria-label="Slide 3"></button>
                     </div>
                     <div class="carousel-inner h-100">
                         <div class="carousel-item active h-100" data-bs-interval="3500">
                             <div class="d-flex flex-column justify-content-center h-100 p-4 text-start bg-warning text-dark">
                                 <span class="badge bg-danger align-self-start mb-2">Combo del Día</span>
                                 <h3 class="fw-bold mb-1 combo-titulo">Combo Universitario</h3>
-                                <p class="mb-2 text-dark">Lleva tu almuerzo + cualquier bebida seleccionada por solo <strong>$2.75</strong>.</p>
+                                <p class="mb-2 text-dark">Lleva tu almuerzo + bebida por solo <strong>$2.75</strong>.</p>
                                 <small class="text-secondary">*Promoción válida hasta las 3:30 PM.</small>
                             </div>
                         </div>
@@ -81,7 +106,7 @@
                             <div class="d-flex flex-column justify-content-center h-100 p-4 text-start bg-danger text-white">
                                 <span class="badge bg-warning text-dark align-self-start mb-2">Especialidad</span>
                                 <h3 class="fw-bold mb-1 text-white">Arroz con Camarón</h3>
-                                <p class="mb-2">Prueba nuestro arroz con camarón premium acompañado de ensalada fresca por <strong>$2.50</strong>.</p>
+                                <p class="mb-2">Premium acompañado de ensalada fresca por <strong>$2.50</strong>.</p>
                                 <small class="text-white-50">*Preparado al instante con ingredientes frescos.</small>
                             </div>
                         </div>
@@ -89,7 +114,7 @@
                             <div class="d-flex flex-column justify-content-center h-100 p-4 text-start bg-success text-white">
                                 <span class="badge bg-light text-success align-self-start mb-2">Refrescante</span>
                                 <h3 class="fw-bold mb-1 text-white">Bebidas Heladas</h3>
-                                <p class="mb-2">Acompaña tu comida con una Fanta o Sprite de 500ml por solo <strong>$0.50</strong>.</p>
+                                <p class="mb-2">Fanta o Sprite de 500ml por solo <strong>$0.50</strong>.</p>
                                 <small class="text-white-50">*Disponibles en el área de bebidas.</small>
                             </div>
                         </div>
@@ -106,109 +131,141 @@
             </aside>
         </div>
 
-        <section id="menu">
-            <h2>Nuestro Menú</h2>
-            <div class="menu-catalogo">
-                <div class="categoria-columna">
-                    <h3 class="categoria-titulo"><i class="fas fa-bowl-rice"></i> Almuerzos</h3>
-                    <div class="tarjetas-lista">
-                        <div class="tarjeta-item">
-                            <div class="card tarjeta">
-                                <img src="../imagenes/menu/almuerzos/arroz-con-camaron.jpg" class="card-img-top" alt="Arroz con camarón">
-                                <div class="card-body p-0 d-flex flex-column">
-                                    <h4 class="card-title mt-0">Arroz con camarón</h4>
-                                    <p class="card-text">Con porción especial de ensalada.</p>
-                                    <div class="precio-accion">
-                                        <strong>$2.50</strong>
-                                        <button class="btn-agregar" data-bs-toggle="modal" data-bs-target="#carritoModal">Añadir al carrito</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tarjeta-item">
-                            <div class="card tarjeta">
-                                <img src="../imagenes/menu/almuerzos/arroz-con-menestra-y-carne.jpg" class="card-img-top" alt="Arroz con menestra y carne">
-                                <div class="card-body p-0 d-flex flex-column">
-                                    <h4 class="card-title mt-0">Arroz con menestra</h4>
-                                    <p class="card-text">Con carne asada y ensalada.</p>
-                                    <div class="precio-accion">
-                                        <strong>$2.50</strong>
-                                        <button class="btn-agregar" data-bs-toggle="modal" data-bs-target="#carritoModal">Añadir al carrito</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="categoria-columna">
-                    <h3 class="categoria-titulo"><i class="fas fa-glass-water"></i> Bebidas</h3>
-                    <div class="tarjetas-lista">
-                        <div class="tarjeta-item">
-                            <div class="card tarjeta">
-                                <img src="../imagenes/menu/bebidas/sprite.webp" class="card-img-top" alt="Sprite">
-                                <div class="card-body p-0 d-flex flex-column">
-                                    <h4 class="card-title mt-0">Sprite</h4>
-                                    <p class="card-text">Botella personal 500ml.</p>
-                                    <div class="precio-accion">
-                                        <strong>$0.50</strong>
-                                        <button class="btn-agregar" data-bs-toggle="modal" data-bs-target="#carritoModal">Añadir al carrito</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tarjeta-item">
-                            <div class="card tarjeta">
-                                <img src="../imagenes/menu/bebidas/fanta.webp" class="card-img-top" alt="Fanta">
-                                <div class="card-body p-0 d-flex flex-column">
-                                    <h4 class="card-title mt-0">Fanta</h4>
-                                    <p class="card-text">Botella personal 500ml.</p>
-                                    <div class="precio-accion">
-                                        <strong>$0.50</strong>
-                                        <button class="btn-agregar" data-bs-toggle="modal" data-bs-target="#carritoModal">Añadir al carrito</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="categoria-columna">
-                    <h3 class="categoria-titulo"><i class="fas fa-cookie"></i> Snacks</h3>
-                    <div class="tarjetas-lista">
-                        <div class="tarjeta-item">
-                            <div class="card tarjeta">
-                                <img src="../imagenes/menu/snacks/galletas-chips-ahoy.jpg" class="card-img-top" alt="Chips Ahoy">
-                                <div class="card-body p-0 d-flex flex-column">
-                                    <h4 class="card-title mt-0">Chips Ahoy</h4>
-                                    <p class="card-text">Con chispas de chocolate.</p>
-                                    <div class="precio-accion">
-                                        <strong>$0.40</strong>
-                                        <button class="btn-agregar" data-bs-toggle="modal" data-bs-target="#carritoModal">Añadir al carrito</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tarjeta-item">
-                            <div class="card tarjeta">
-                                <img src="../imagenes/menu/snacks/galletas-oreo.webp" class="card-img-top" alt="Oreo">
-                                <div class="card-body p-0 d-flex flex-column">
-                                    <h4 class="card-title mt-0">Galletas Oreo</h4>
-                                    <p class="card-text">Paquete 4 unidades.</p>
-                                    <div class="precio-accion">
-                                        <strong>$0.40</strong>
-                                        <button class="btn-agregar" data-bs-toggle="modal" data-bs-target="#carritoModal">Añadir al carrito</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Panel de indicadores (estadísticas rápidas) -->
+        <section id="indicadores" class="seccion-indicadores">
+            <h2>Resumen del sistema</h2>
+            <div class="grid-indicadores">
+                <article class="indicador-card">
+                    <i class="fas fa-utensils"></i>
+                    <span id="ind-total-productos">—</span>
+                    <p>Productos</p>
+                </article>
+                <article class="indicador-card">
+                    <i class="fas fa-tags"></i>
+                    <span id="ind-total-categorias">—</span>
+                    <p>Categorías</p>
+                </article>
+                <article class="indicador-card indicador-verde">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="ind-disponibles">—</span>
+                    <p>Disponibles</p>
+                </article>
+                <article class="indicador-card indicador-rojo">
+                    <i class="fas fa-times-circle"></i>
+                    <span id="ind-agotados">—</span>
+                    <p>Agotados</p>
+                </article>
+                <article class="indicador-card">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span id="ind-precio-promedio">—</span>
+                    <p>Precio promedio</p>
+                </article>
+                <article class="indicador-card">
+                    <i class="fas fa-users"></i>
+                    <span id="ind-usuarios">—</span>
+                    <p>Usuarios</p>
+                </article>
+                <article class="indicador-card">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="ind-carrito">—</span>
+                    <p>En tu carrito</p>
+                </article>
             </div>
-            <hr>
         </section>
 
+        <!-- Gráfico de Chart.js -->
+        <section id="seccion-grafico" class="seccion-grafico">
+            <h2>Distribución del menú</h2>
+            <div class="grafico-contenedor">
+                <canvas id="grafico-categorias"></canvas>
+            </div>
+        </section>
+
+        <!-- Panel del clima actual -->
+        <section id="seccion-clima" class="seccion-clima">
+            <h2><i class="fas fa-cloud-sun"></i> Clima actual — Santo Domingo</h2>
+            <div id="panel-clima">
+                <!-- El clima se inserta dinámicamente aquí -->
+            </div>
+        </section>
+
+        <!-- Herramientas de búsqueda, filtros y ordenamiento -->
+        <section id="herramientas-menu" class="herramientas-menu">
+            <h2 id="menu">Nuestro Menú</h2>
+
+            <div class="barra-herramientas">
+                <!-- Búsqueda en tiempo real -->
+                <div class="grupo-busqueda">
+                    <label for="busqueda-menu"><i class="fas fa-search"></i></label>
+                    <input type="text" id="busqueda-menu" placeholder="Buscar en el menú..." autocomplete="off">
+                </div>
+
+                <!-- Filtro por categoría -->
+                <div class="grupo-filtro">
+                    <label for="filtro-categoria">Categoría:</label>
+                    <select id="filtro-categoria">
+                        <option value="">Todas las categorías</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por estado -->
+                <div class="grupo-filtro">
+                    <label for="filtro-estado">Estado:</label>
+                    <select id="filtro-estado">
+                        <option value="">Todos</option>
+                        <option value="disponible">Disponible</option>
+                        <option value="agotado">Agotado</option>
+                    </select>
+                </div>
+
+                <!-- Filtro por rango de precio -->
+                <div class="grupo-filtro">
+                    <label>Precio:</label>
+                    <div class="rango-precio">
+                        <input type="number" id="filtro-precio-min" placeholder="Mín $" min="0" step="0.1">
+                        <span>—</span>
+                        <input type="number" id="filtro-precio-max" placeholder="Máx $" min="0" step="0.1">
+                    </div>
+                </div>
+
+                <!-- Ordenamiento -->
+                <div class="grupo-filtro">
+                    <label for="filtro-orden">Ordenar por:</label>
+                    <select id="filtro-orden">
+                        <option value="">Sin orden</option>
+                        <option value="precio-asc">Precio: menor a mayor</option>
+                        <option value="precio-desc">Precio: mayor a menor</option>
+                        <option value="nombre-asc">Nombre: A-Z</option>
+                        <option value="nombre-desc">Nombre: Z-A</option>
+                        <option value="stock-desc">Mayor disponibilidad</option>
+                    </select>
+                </div>
+
+                <!-- Botón limpiar filtros -->
+                <button id="btn-limpiar-filtros" class="btn-limpiar">
+                    <i class="fas fa-times"></i> Limpiar
+                </button>
+
+                <!-- Botón restablecer datos originales -->
+                <button id="btn-restablecer-datos" class="btn-restablecer">
+                    <i class="fas fa-redo"></i> Restablecer
+                </button>
+            </div>
+
+            <!-- Contador de resultados -->
+            <p id="contador-resultados" class="contador-resultados"></p>
+        </section>
+
+        <!-- Contenedor del menú — se rellena dinámicamente desde JSON -->
+        <section id="seccion-menu">
+            <div id="contenedor-menu" class="menu-catalogo">
+                <!-- Las tarjetas se generan aquí con JavaScript -->
+            </div>
+        </section>
+
+        <!-- Horarios de servicio -->
         <section id="info-adicional">
             <h2>Información Adicional</h2>
-
             <h3 id="horarios">Horarios de Servicio</h3>
             <table>
                 <thead>
@@ -231,24 +288,26 @@
                     </tr>
                     <tr>
                         <td>Domingos</td>
-                        <td colspan="2">
-                            <h3>Cerrado</h3>
-                        </td>
+                        <td colspan="2">Cerrado</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
+        <!-- Preguntas frecuentes -->
         <section id="preguntas_frecuentes">
             <h3>Preguntas Frecuentes</h3>
             <div class="accordion accordion-flush" id="faqAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="faqHeadingOne">
-                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseOne" aria-expanded="false" aria-controls="faqCollapseOne">
+                        <button class="accordion-button collapsed fw-bold" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#faqCollapseOne"
+                            aria-expanded="false" aria-controls="faqCollapseOne">
                             ¿Cuáles son las formas de pago aceptadas?
                         </button>
                     </h2>
-                    <div id="faqCollapseOne" class="accordion-collapse collapse" aria-labelledby="faqHeadingOne" data-bs-parent="#faqAccordion">
+                    <div id="faqCollapseOne" class="accordion-collapse collapse"
+                        aria-labelledby="faqHeadingOne" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
                             Por ahora aceptamos pagos en efectivo y transferencias bancarias directas (Pichincha / Produbanco).
                         </div>
@@ -256,25 +315,31 @@
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="faqHeadingTwo">
-                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo" aria-expanded="false" aria-controls="faqCollapseTwo">
+                        <button class="accordion-button collapsed fw-bold" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#faqCollapseTwo"
+                            aria-expanded="false" aria-controls="faqCollapseTwo">
                             ¿Dónde retirar el pedido?
                         </button>
                     </h2>
-                    <div id="faqCollapseTwo" class="accordion-collapse collapse" aria-labelledby="faqHeadingTwo" data-bs-parent="#faqAccordion">
+                    <div id="faqCollapseTwo" class="accordion-collapse collapse"
+                        aria-labelledby="faqHeadingTwo" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            Una vez validado el menú desde la web, debes acercarte a la garita principal y esperar al respectivo repartidor con el logo de FastMenu en su transporte (moto o carro). Te recordamos que debido a la distancia (aprox. 2Km) desde nuestro punto de cocina hasta la universidad, los pedidos toman entre 15 y 20 minutos en llegar una vez confirmados.
+                            Una vez validado el menú desde la web, acércate a la garita principal. Los pedidos toman entre 15 y 20 minutos en llegar.
                         </div>
                     </div>
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="faqHeadingThree">
-                        <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapseThree" aria-expanded="false" aria-controls="faqCollapseThree">
+                        <button class="accordion-button collapsed fw-bold" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#faqCollapseThree"
+                            aria-expanded="false" aria-controls="faqCollapseThree">
                             ¿Qué pasa si no llega mi pedido a tiempo?
                         </button>
                     </h2>
-                    <div id="faqCollapseThree" class="accordion-collapse collapse" aria-labelledby="faqHeadingThree" data-bs-parent="#faqAccordion">
+                    <div id="faqCollapseThree" class="accordion-collapse collapse"
+                        aria-labelledby="faqHeadingThree" data-bs-parent="#faqAccordion">
                         <div class="accordion-body">
-                            Si tu pedido no llega dentro del tiempo estimado, por favor contacta con nuestro servicio al cliente para resolver la situación.
+                            Si tu pedido no llega dentro del tiempo estimado, contacta con nuestro servicio al cliente para resolver la situación.
                         </div>
                     </div>
                 </div>
@@ -283,31 +348,28 @@
 
     </main>
 
-    <!-- Modal de Confirmación de Carrito -->
-    <div class="modal fade" id="carritoModal" tabindex="-1" aria-labelledby="carritoModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content text-start">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="carritoModalLabel"><i class="fas fa-check-circle me-2"></i>¡Añadido al Carrito!</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-4">
-                    <p class="fs-6 mb-2">El producto seleccionado se ha agregado con éxito a tu carrito simulado.</p>
-                    <p class="text-muted small mb-0">Puedes confirmar y completar tu pedido en la página <strong>Mi pedido</strong>.</p>
-                </div>
-                <div class="modal-footer border-top-0 pt-0 justify-content-end">
-                    <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal">Seguir comprando</button>
-                    <a href="pedido.html" class="btn btn-success btn-sm px-3">Ir al Carrito</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <footer>
         <p>Copyright &copy; 2026 FastMenu ESPE. Todos los derechos reservados.</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Toastify -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Módulos propios (orden importante: dependencias primero) -->
+    <script src="../js/almacenamiento.js"></script>
+    <script src="../js/datos.js"></script>
+    <script src="../js/validaciones.js"></script>
+    <script src="../js/componentes.js"></script>
+    <script src="../js/api.js"></script>
+    <script src="../js/estadisticas.js"></script>
+    <script src="../js/main.js"></script>
 </body>
 
 </html>

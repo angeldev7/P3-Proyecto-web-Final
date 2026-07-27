@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1,
+    "nombres": "Carlos Andrés",
+    "apellidos": "Rodríguez Pérez",
+    "email": "carodriguez@espe.edu.ec",
+    "password": "Espe2026#",
+    "cedula": "1712345678",
+    "fechaNacimiento": "2000-03-15",
+    "genero": "masculino",
+    "telefono": "0991234567",
+    "nacionalidad": {
+      "nombre": "Ecuador",
+      "codigoPais": "EC",
+      "bandera": "🇪🇨"
+    },
+    "fechaRegistro": "2026-05-18",
+    "rol": "estudiante"
+  },
+  {
+    "id": 2,
+    "nombres": "María José",
+    "apellidos": "Salazar Vega",
+    "email": "mjsalazar@espe.edu.ec",
+    "password": "Espe2026#",
+    "cedula": "1723456789",
+    "fechaNacimiento": "2001-07-22",
+    "genero": "femenino",
+    "telefono": "0987654321",
+    "nacionalidad": {
+      "nombre": "Ecuador",
+      "codigoPais": "EC",
+      "bandera": "🇪🇨"
+    },
+    "fechaRegistro": "2026-05-20",
+    "rol": "estudiante"
+  },
+  {
+    "id": 3,
+    "nombres": "Luis Fernando",
+    "apellidos": "Mora Tapia",
+    "email": "lfmora@espe.edu.ec",
+    "password": "Espe2026#",
+    "cedula": "1734567890",
+    "fechaNacimiento": "1999-11-10",
+    "genero": "masculino",
+    "telefono": "0976543210",
+    "nacionalidad": {
+      "nombre": "Colombia",
+      "codigoPais": "CO",
+      "bandera": "🇨🇴"
+    },
+    "fechaRegistro": "2026-06-01",
+    "rol": "estudiante"
+  },
+  {
+    "id": 4,
+    "nombres": "Ana Lucía",
+    "apellidos": "Torres Jiménez",
+    "email": "altorres@espe.edu.ec",
+    "password": "Admin2026#",
+    "cedula": "1745678901",
+    "fechaNacimiento": "1985-04-05",
+    "genero": "femenino",
+    "telefono": "0965432109",
+    "nacionalidad": {
+      "nombre": "Ecuador",
+      "codigoPais": "EC",
+      "bandera": "🇪🇨"
+    },
+    "fechaRegistro": "2026-05-15",
+    "rol": "admin"
+  },
+  {
+    "id": 5,
+    "nombres": "Diego Sebastián",
+    "apellidos": "Flores Andrade",
+    "email": "dsflores@espe.edu.ec",
+    "password": "Espe2026#",
+    "cedula": "1756789012",
+    "fechaNacimiento": "2002-09-28",
+    "genero": "masculino",
+    "telefono": "0954321098",
+    "nacionalidad": {
+      "nombre": "Perú",
+      "codigoPais": "PE",
+      "bandera": "🇵🇪"
+    },
+    "fechaRegistro": "2026-06-10",
+    "rol": "estudiante"
+  }
+]

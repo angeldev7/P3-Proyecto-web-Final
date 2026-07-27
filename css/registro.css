@@ -122,3 +122,83 @@
     display: block;
     text-align: center;
 }
+
+/* ──────────────────────────────────────────────
+   SELECTOR DE PAÍSES (API countries.dev)
+   ────────────────────────────────────────────── */
+.selector-pais-contenedor {
+    position: relative;
+}
+
+/* Lista desplegable de países */
+.lista-paises-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 0 0 10px 10px;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 100;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* Mostrar el dropdown cuando tiene la clase activa */
+.lista-paises-dropdown.dropdown-visible {
+    display: block;
+}
+
+/* Ítem de país en el dropdown */
+.pais-item {
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.15s ease;
+}
+
+.pais-item:hover {
+    background: rgba(139, 0, 0, 0.07);
+}
+
+.pais-bandera {
+    font-size: 1.2rem;
+}
+
+/* Mensaje cuando no hay países encontrados */
+.pais-vacio {
+    color: #95a5a6;
+    cursor: default;
+    justify-content: center;
+    font-style: italic;
+}
+
+/* ──────────────────────────────────────────────
+   VALIDACIONES — errores de formulario
+   ────────────────────────────────────────────── */
+.campo-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15) !important;
+}
+
+.texto-error {
+    display: block;
+    color: #e74c3c;
+    font-size: 0.78rem;
+    margin-top: 3px;
+    padding-left: 2px;
+}
+
+/* Indicador de campo obligatorio */
+.obligatorio {
+    color: #e74c3c;
+    margin-left: 2px;
+}

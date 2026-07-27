@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "nombre": "Almuerzos",
+    "icono": "fas fa-bowl-rice",
+    "descripcion": "Platos fuertes preparados al instante con ingredientes frescos.",
+    "color": "#e74c3c"
+  },
+  {
+    "id": 2,
+    "nombre": "Bebidas",
+    "icono": "fas fa-glass-water",
+    "descripcion": "Refrescos y bebidas frías para acompañar tu comida.",
+    "color": "#2980b9"
+  },
+  {
+    "id": 3,
+    "nombre": "Snacks",
+    "icono": "fas fa-cookie",
+    "descripcion": "Paquetes y bocadillos perfectos para el recreo.",
+    "color": "#f39c12"
+  },
+  {
+    "id": 4,
+    "nombre": "Combos",
+    "icono": "fas fa-star",
+    "descripcion": "Combinaciones especiales con descuento para estudiantes.",
+    "color": "#27ae60"
+  }
+]
