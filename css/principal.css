@@ -54,9 +54,9 @@ aside h3 {
 }
 
 .menu-catalogo {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
     width: 100%;
 }
 
@@ -66,24 +66,28 @@ aside h3 {
 }
 
 .categoria-titulo {
-    font-size: 1.2em;
+    font-size: 1.15em;
     color: #8b0000;
     border-bottom: 2px solid #e0e0e0;
     padding-bottom: 8px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .tarjetas-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
 }
 
 .tarjeta-item {
     width: 100%;
+    display: flex;
 }
 
 /* Tarjeta estructurada con Flexbox */
@@ -96,10 +100,11 @@ aside h3 {
     background-color: #ffffff;
     border: 1px solid #e0e0e0;
     border-radius: 12px;
-    padding: 15px;
+    padding: 0;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     height: 100%;
+    overflow: hidden;
 }
 
 #menu .tarjeta:hover {
@@ -110,12 +115,19 @@ aside h3 {
 
 #menu .tarjeta img {
     width: 100%;
-    height: 140px;
-    object-fit: contain;
-    background-color: #ffffff;
-    padding: 5px;
-    border-radius: 6px;
-    margin-bottom: 15px;
+    height: 100%;
+    object-fit: cover;
+    background-color: #f8f8f8;
+    padding: 0;
+    border: none !important;
+    border-radius: 0;
+    margin: 0;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+#menu .tarjeta:hover img {
+    transform: scale(1.05);
 }
 
 #menu .tarjeta figcaption {
@@ -215,8 +227,14 @@ aside h3 {
 /* ============================================================
    BLOQUE 5: DISEÑO ADAPTATIVO ESPECÍFICO
    ============================================================ */
+@media (max-width: 1200px) {
+    .tarjetas-lista {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
 @media (max-width: 900px) {
-    .menu-catalogo {
+    .tarjetas-lista {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -232,13 +250,13 @@ aside h3 {
     }
     
     #menu .tarjeta img {
-        height: 160px;
+        height: 140px;
     }
 }
 
-@media (max-width: 600px) {
-    .menu-catalogo {
-        grid-template-columns: 1fr;
+@media (max-width: 500px) {
+    .tarjetas-lista {
+        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -340,7 +358,11 @@ aside h3 {
 /* Badge "Agotado" sobre la imagen */
 .tarjeta-imagen-contenedor {
     position: relative;
+    width: 100%;
+    height: 180px;
     overflow: hidden;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eef0f2;
 }
 
 .badge-agotado {
@@ -354,6 +376,7 @@ aside h3 {
     border-radius: 20px;
     font-weight: 700;
     text-transform: uppercase;
+    z-index: 2;
 }
 
 /* Tarjeta agotada con opacidad */
@@ -509,13 +532,17 @@ aside h3 {
 
 /* Saludo al usuario activo */
 .saludo-usuario {
-    background: linear-gradient(90deg, #8b0000, #c0392b);
+    background: linear-gradient(135deg, #8b0000, #a00000);
     color: white;
     text-align: center;
-    padding: 0.6rem;
-    font-size: 0.95rem;
-    font-weight: 600;
-    border-radius: 0 0 12px 12px;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 8px;
+    margin: 0 auto 1.5rem auto;
+    box-shadow: 0 4px 12px rgba(139, 0, 0, 0.2);
+    width: 100%;
+    max-width: 900px;
 }
 
 /* Contador de carrito en la navbar */
@@ -550,3 +577,22 @@ aside h3 {
         flex: 1;
     }
 }
+
+
+
+/* Botón restablecer */
+.btn-restablecer {
+    background: #e8e8e8;
+    color: #555;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-restablecer:hover { background: #d0d0d0; }

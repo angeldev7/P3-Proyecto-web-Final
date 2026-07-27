@@ -12,6 +12,8 @@
 function crearTarjetaProducto(producto, listaCategorias) {
     var nombreCategoria = obtenerNombreCategoria(producto.categoriaId, listaCategorias);
     var estaAgotado    = producto.estado === "agotado" || producto.stock === 0;
+    var rutaImagen     = corregirRutaImagen(producto.imagen);
+    var rutaFallback   = EN_SUBCARPETA_PAGES ? "../imagenes/logo/fastfood-logo.jpg" : "imagenes/logo/fastfood-logo.jpg";
 
     // Contenedor principal de la tarjeta
     var tarjetaItem = document.createElement("div");
@@ -22,11 +24,11 @@ function crearTarjetaProducto(producto, listaCategorias) {
     tarjetaItem.innerHTML =
         '<div class="card tarjeta' + (estaAgotado ? " tarjeta-agotada" : "") + '">' +
             '<div class="tarjeta-imagen-contenedor">' +
-                '<img src="' + producto.imagen + '" class="card-img-top" alt="' + producto.nombre + '" ' +
-                    'onerror="this.src=\'../imagenes/logo/fastfood-logo.jpg\'">' +
+                '<img src="' + rutaImagen + '" class="card-img-top" alt="' + producto.nombre + '" ' +
+                    'onerror="this.src=\'' + rutaFallback + '\'"> ' +
                 (estaAgotado ? '<span class="badge-agotado">Agotado</span>' : "") +
             "</div>" +
-            '<div class="card-body p-0 d-flex flex-column">' +
+            '<div class="card-body p-3 d-flex flex-column">' +
                 '<span class="badge-categoria">' + nombreCategoria + "</span>" +
                 '<h4 class="card-title mt-0">' + producto.nombre + "</h4>" +
                 '<p class="card-text">' + producto.descripcion + "</p>" +
@@ -135,13 +137,14 @@ function renderizarTarjetasCatalogo(productos, listaCategorias, contenedor) {
 function crearTarjetaCatalogo(producto, listaCategorias) {
     var nombreCategoria = obtenerNombreCategoria(producto.categoriaId, listaCategorias);
     var estaAgotado    = producto.estado === "agotado" || producto.stock === 0;
+    var rutaImagen     = corregirRutaImagen(producto.imagen);
 
     var tarjeta = document.createElement("div");
     tarjeta.className = "tarjeta-catalogo";
     tarjeta.setAttribute("data-id", producto.id);
 
     tarjeta.innerHTML =
-        '<img src="' + producto.imagen + '" alt="' + producto.nombre + '" class="img-catalogo" ' +
+        '<img src="' + rutaImagen + '" alt="' + producto.nombre + '" class="img-catalogo" ' +
             'onerror="this.src=\'../imagenes/logo/fastfood-logo.jpg\'">' +
         '<div class="catalogo-info">' +
             '<span class="badge-categoria">' + nombreCategoria + "</span>" +
@@ -230,18 +233,31 @@ function mostrarNotificacion(mensaje, tipo) {
 }
 
 // ──────────────────────────────────────────────
+// Función para ajustar las imágenes a una dimensión estándar al ver los detalles
+// ──────────────────────────────────────────────
+function generarImagenDetalleEstandar(rutaImagen, nombreProducto, rutaFallback) {
+    return '<div class="swal-imagen-contenedor" style="width:100%; height:220px; overflow:hidden; border-radius:10px; margin-bottom:15px; background-color:#f8f9fa;">' +
+               '<img src="' + rutaImagen + '" alt="' + nombreProducto + '" ' +
+                   'style="width:100%; height:100%; object-fit:cover; display:block;" ' +
+                   'onerror="this.src=\'' + rutaFallback + '\'">' +
+           '</div>';
+}
+
+// ──────────────────────────────────────────────
 // Mostrar DETALLES de un producto con SweetAlert2
 // ──────────────────────────────────────────────
 function mostrarDetallesProducto(producto, listaCategorias) {
     var nombreCategoria = obtenerNombreCategoria(producto.categoriaId, listaCategorias);
     var estaAgotado    = producto.estado === "agotado" || producto.stock === 0;
+    var rutaImagen     = corregirRutaImagen(producto.imagen);
+    var rutaFallback   = EN_SUBCARPETA_PAGES ? "../imagenes/logo/fastfood-logo.jpg" : "imagenes/logo/fastfood-logo.jpg";
+    var htmlImagenEstandar = generarImagenDetalleEstandar(rutaImagen, producto.nombre, rutaFallback);
 
     Swal.fire({
         title:           producto.nombre,
         html:
             '<div class="swal-detalle">' +
-                '<img src="' + producto.imagen + '" alt="' + producto.nombre + '" ' +
-                    'class="swal-imagen" onerror="this.src=\'../imagenes/logo/fastfood-logo.jpg\'">' +
+                htmlImagenEstandar +
                 '<p class="swal-descripcion">' + producto.descripcion + "</p>" +
                 '<table class="swal-tabla">' +
                     "<tr><td><strong>Categoría:</strong></td><td>" + nombreCategoria + "</td></tr>" +
@@ -252,7 +268,7 @@ function mostrarDetallesProducto(producto, listaCategorias) {
                 "</table>" +
             "</div>",
         confirmButtonText: "Cerrar",
-        confirmButtonColor: "#e74c3c",
+        confirmButtonColor: "#8b0000",
         showClass: { popup: "animate__animated animate__fadeInDown" }
     });
 }

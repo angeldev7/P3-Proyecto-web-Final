@@ -374,8 +374,19 @@ function mostrarSaludoUsuario() {
     }
 
     if (usuario !== null) {
-        seccionSaludo.textContent = "¡Bienvenido, " + usuario.nombres + "!";
+        var rolTexto = (usuario.rol === "administrador") ? " [Administrador]" : "";
+        seccionSaludo.textContent = "¡Bienvenido/a, " + usuario.nombres + rolTexto + "!";
         seccionSaludo.style.display = "block";
+        seccionSaludo.style.opacity = "1";
+        seccionSaludo.style.transition = "opacity 0.8s ease";
+
+        // Desaparecer automáticamente después de 5 segundos (5000 ms)
+        setTimeout(function() {
+            seccionSaludo.style.opacity = "0";
+            setTimeout(function() {
+                seccionSaludo.style.display = "none";
+            }, 800);
+        }, 5000);
     }
 }
 
@@ -390,7 +401,7 @@ if (btnRestablecer !== null) {
             text:               "Esto eliminará todos los productos que hayas agregado o editado y cargará los datos originales del JSON.",
             icon:               "warning",
             showCancelButton:   true,
-            confirmButtonColor: "#e74c3c",
+            confirmButtonColor: "#8b0000",
             cancelButtonColor:  "#7f8c8d",
             confirmButtonText:  "Sí, restablecer",
             cancelButtonText:   "Cancelar"
@@ -415,3 +426,5 @@ if (btnRestablecer !== null) {
         });
     });
 }
+
+

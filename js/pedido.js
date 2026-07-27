@@ -24,36 +24,47 @@ function inicializarPaginaPedido() {
 // Renderizar el contenido del carrito en la tabla
 // ──────────────────────────────────────────────
 function renderizarCarrito() {
-    var carrito     = obtenerCarrito();
-    var cuerpTabla  = document.getElementById("cuerpo-carrito");
-    var totalTexto  = document.getElementById("total-carrito");
-    var seccionVacia = document.getElementById("seccion-carrito-vacio");
+    var carrito        = obtenerCarrito();
+    var cuerpTabla     = document.getElementById("cuerpo-carrito");
+    var tablaCarrito   = document.getElementById("tabla-carrito");
+    var totalTexto     = document.getElementById("total-carrito");
+    var seccionVacia   = document.getElementById("seccion-carrito-vacio");
     var seccionResumen = document.getElementById("resumen-compra");
+    var btnContenedor  = document.querySelector(".confirm-btn-container");
 
     if (cuerpTabla === null) {
         return;
     }
 
-    // Limpiar la tabla
-    cuerpTabla.innerHTML = "";
+    // Mantener la sección principal visible
+    if (seccionResumen !== null) {
+        seccionResumen.style.display = "block";
+    }
 
     if (carrito.length === 0) {
-        // Mostrar mensaje de carrito vacío
+        // Mostrar mensaje de carrito vacío dentro del contenedor
         if (seccionVacia !== null) {
-            seccionVacia.style.display = "block";
+            seccionVacia.style.display = "flex";
         }
-        if (seccionResumen !== null) {
-            seccionResumen.style.display = "none";
+        if (tablaCarrito !== null) {
+            tablaCarrito.style.display = "none";
         }
+        if (btnContenedor !== null) {
+            btnContenedor.style.display = "none";
+        }
+        actualizarContadorCarrito();
         return;
     }
 
-    // Ocultar mensaje de vacío si hay items
+    // Mostrar tabla y botones si hay productos
     if (seccionVacia !== null) {
         seccionVacia.style.display = "none";
     }
-    if (seccionResumen !== null) {
-        seccionResumen.style.display = "block";
+    if (tablaCarrito !== null) {
+        tablaCarrito.style.display = "table";
+    }
+    if (btnContenedor !== null) {
+        btnContenedor.style.display = "flex";
     }
 
     // Crear una fila por cada item del carrito

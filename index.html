@@ -69,7 +69,7 @@
     <script src="js/validaciones.js"></script>
     <script src="js/componentes.js"></script>
     <script>
-        // Lógica del inicio de sesión
+        // Lógica del inicio de sesión con validación estricta
         document.addEventListener("DOMContentLoaded", function() {
             // Cargar datos en localStorage si aún no existen
             cargarUsuarios().catch(function(error) {
@@ -83,7 +83,6 @@
 
                     var usuario   = document.getElementById("usuario").value.trim();
                     var password  = document.getElementById("password").value;
-                    var recordar  = document.getElementById("recordarme").checked;
 
                     if (campoEstaVacio(usuario) || campoEstaVacio(password)) {
                         mostrarNotificacion("Por favor ingresa tu usuario y contraseña.", "advertencia");
@@ -92,40 +91,46 @@
 
                     // Buscar el usuario en localStorage
                     var usuarios = obtenerDeStorage(CLAVE_USUARIOS);
-                    if (usuarios === null) {
-                        usuarios = [];
+                    if (usuarios === null || usuarios.length === 0) {
+                        // Cargar desde JSON si aún no se ha sincronizado
+                        cargarUsuarios().then(function(lista) {
+                            validarCredenciales(lista, usuario, password);
+                        });
+                        return;
                     }
 
-                    var usuarioEncontrado = null;
-                    for (var u of usuarios) {
-                        var coincideEmail  = u.email    === usuario;
-                        var coincideCedula = u.cedula   === usuario;
-                        var coincidePass   = u.password === password;
-
-                        if ((coincideEmail || coincideCedula) && coincidePass) {
-                            usuarioEncontrado = u;
-                            break;
-                        }
-                    }
-
-                    if (usuarioEncontrado !== null) {
-                        // Guardar la sesión activa
-                        guardarUsuarioActivo(usuarioEncontrado);
-                        mostrarNotificacion("¡Bienvenido/a, " + usuarioEncontrado.nombres + "!", "exito");
-
-                        // Redirigir después de un breve instante
-                        setTimeout(function() {
-                            window.location.href = "pages/principal.html";
-                        }, 1200);
-
-                    } else {
-                        // Permitir acceso de invitado si el campo no está vacío (modo demo)
-                        mostrarNotificacion("¡Bienvenido! Entrando en modo invitado.", "info");
-                        setTimeout(function() {
-                            window.location.href = "pages/principal.html";
-                        }, 1200);
-                    }
+                    validarCredenciales(usuarios, usuario, password);
                 });
+            }
+
+            function validarCredenciales(listaUsuarios, usuarioInput, passwordInput) {
+                var usuarioEncontrado = null;
+
+                for (var u of listaUsuarios) {
+                    var coincideEmail  = (u.email && u.email.toLowerCase() === usuarioInput.toLowerCase());
+                    var coincideCedula = (u.cedula && u.cedula === usuarioInput);
+                    var coincidePass   = (u.password === passwordInput);
+
+                    if ((coincideEmail || coincideCedula) && coincidePass) {
+                        usuarioEncontrado = u;
+                        break;
+                    }
+                }
+
+                if (usuarioEncontrado !== null) {
+                    // Guardar la sesión activa
+                    guardarUsuarioActivo(usuarioEncontrado);
+                    mostrarNotificacion("¡Bienvenido/a, " + usuarioEncontrado.nombres + "!", "exito");
+
+                    // Redirigir después de un breve instante
+                    setTimeout(function() {
+                        window.location.href = "pages/principal.html";
+                    }, 1000);
+
+                } else {
+                    // RECHAZAR acceso si las credenciales son incorrectas
+                    mostrarNotificacion("Usuario o contraseña incorrectos. Verifica tus datos.", "error");
+                }
             }
         });
     </script>

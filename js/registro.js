@@ -19,29 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
 // Inicializar la página de registro
 // ──────────────────────────────────────────────
 function inicializarPaginaRegistro() {
-    // Cargar los países para el selector de nacionalidad
-    var campoBusqueda = document.getElementById("buscar-pais");
-    if (campoBusqueda !== null) {
-        campoBusqueda.placeholder = "Cargando países...";
-        campoBusqueda.disabled    = true;
-
-        cargarPaises()
-            .then(function(paises) {
-                listaPaisesGlobal             = paises;
-                campoBusqueda.placeholder = "Escribe para buscar tu país...";
-                campoBusqueda.disabled    = false;
-                inicializarSelectorPaises(listaPaisesGlobal);
-                mostrarNotificacion(paises.length + " países cargados correctamente", "info");
-            })
-            .catch(function(error) {
-                campoBusqueda.placeholder = "Error al cargar países. Reintenta.";
-                console.error("Error al cargar países:", error);
-
-                // Notificar al usuario del error
-                mostrarNotificacion("No se pudo cargar la lista de países. Verifica tu conexión.", "error");
-            });
-    }
-
     // Precargar los usuarios en localStorage si no existen
     cargarUsuarios().catch(function(error) {
         console.error("Error al precargar usuarios:", error);
@@ -86,6 +63,7 @@ function manejarEnvioRegistro(evento) {
         cedula:          document.getElementById("cedula").value,
         email:           document.getElementById("email").value,
         password:        document.getElementById("password").value,
+        confirmPassword: document.getElementById("confirm_password") ? document.getElementById("confirm_password").value : "",
         fechaNacimiento: document.getElementById("fecha_nacimiento").value,
         genero:          document.getElementById("genero").value,
         telefono:        document.getElementById("telefono") ? document.getElementById("telefono").value : "",
@@ -135,15 +113,9 @@ function manejarEnvioRegistro(evento) {
         return;
     }
 
-    // Parsear la nacionalidad seleccionada
-    var objetoNacionalidad = { nombre: "No especificada", codigoPais: "", bandera: "" };
-    try {
-        if (datosFormulario.nacionalidad !== "" && datosFormulario.nacionalidad !== "{}") {
-            objetoNacionalidad = JSON.parse(datosFormulario.nacionalidad);
-        }
-    } catch (errorParseo) {
-        console.warn("No se pudo parsear la nacionalidad:", errorParseo);
-    }
+    // Formatear la nacionalidad seleccionada
+    var nacValor = datosFormulario.nacionalidad || "🇪🇨 Ecuador";
+    var objetoNacionalidad = { nombre: nacValor, codigoPais: "EC", bandera: nacValor.split(" ")[0] || "🇪🇨" };
 
     // Crear el objeto del nuevo usuario
     var nuevoUsuario = {
@@ -172,9 +144,9 @@ function manejarEnvioRegistro(evento) {
         html:
             "<p>Bienvenido/a <strong>" + nuevoUsuario.nombres + " " + nuevoUsuario.apellidos + "</strong></p>" +
             "<p>Tu cuenta ha sido creada con éxito.</p>" +
-            "<p>Nacionalidad: " + nuevoUsuario.nacionalidad.bandera + " " + nuevoUsuario.nacionalidad.nombre + "</p>",
+            "<p>Nacionalidad: " + nuevoUsuario.nacionalidad.nombre + "</p>",
         confirmButtonText:  "Ir a iniciar sesión",
-        confirmButtonColor: "#e74c3c"
+        confirmButtonColor: "#8b0000"
     }).then(function(resultado) {
         if (resultado.isConfirmed) {
             window.location.href = "../index.html";

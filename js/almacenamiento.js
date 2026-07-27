@@ -172,3 +172,14 @@ function obtenerUsuarioActivo() {
 function cerrarSesion() {
     localStorage.removeItem(CLAVE_USUARIO_ACTIVO);
 }
+
+// ──────────────────────────────────────────────
+// VERIFICAR ROL DE ADMINISTRADOR
+// ──────────────────────────────────────────────
+function esUsuarioAdministrador() {
+    var usuario = obtenerUsuarioActivo();
+    if (usuario !== null && usuario.rol === "administrador") {
+        return true;
+    }
+    return false;
+}

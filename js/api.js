@@ -1,22 +1,8 @@
 /**
  * api.js
- * Módulo para consumir las APIs externas:
- * 1. countries.dev — lista de países con bandera para el registro
- * 2. Open-Meteo  — clima actual en Santo Domingo (sede ESPE)
+ * Módulo para consumir la API externa de clima:
+ * Open-Meteo — clima actual en las sedes de la Universidad ESPE (Santo Domingo y Sangolquí)
  */
-
-// ──────────────────────────────────────────────
-// CONFIGURACIÓN de las APIs
-// ──────────────────────────────────────────────
-
-// API de países (sin clave requerida)
-var URL_PAISES = "https://countries.dev/api/countries";
-
-// API de clima Open-Meteo — coordenadas ESPE Santo Domingo de los Tsáchilas
-var URL_CLIMA = "https://api.open-meteo.com/v1/forecast" +
-    "?latitude=-0.25&longitude=-79.15" +
-    "&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code" +
-    "&timezone=auto";
 
 // ──────────────────────────────────────────────
 // Mapa de códigos de clima (weather_code) de Open-Meteo
@@ -38,143 +24,40 @@ var ESTADOS_CLIMA = {
 };
 
 // ──────────────────────────────────────────────
-// CARGAR PAÍSES desde la API countries.dev
-// Retorna una promesa con el arreglo de países
+// Coordenadas de las 2 sedes principales de la ESPE para Open-Meteo
 // ──────────────────────────────────────────────
-function cargarPaises() {
-    return fetch(URL_PAISES)
-        .then(function(respuesta) {
-            if (!respuesta.ok) {
-                throw new Error("Error al consultar la API de países. Código: " + respuesta.status);
-            }
-            return respuesta.json();
-        })
-        .then(function(datos) {
-            // Ordenamos los países por nombre para facilitar la búsqueda
-            var paises = [];
-            for (var pais of datos) {
-                paises.push({
-                    codigo:  pais.cca2  || pais.code || "",
-                    nombre:  pais.name  || pais.nombre || "",
-                    bandera: pais.emoji || pais.flag || ""
-                });
-            }
-            // Ordenar alfabéticamente por nombre
-            paises.sort(function(a, b) {
-                if (a.nombre < b.nombre) { return -1; }
-                if (a.nombre > b.nombre) { return  1; }
-                return 0;
-            });
-            return paises;
-        })
-        .catch(function(error) {
-            console.error("Error al cargar países:", error);
-            throw error;
-        });
-}
-
-// ──────────────────────────────────────────────
-// INICIALIZAR el selector de países en registro.html
-// Conecta el campo de búsqueda con la lista desplegable
-// ──────────────────────────────────────────────
-function inicializarSelectorPaises(listaPaises) {
-    var campoBusqueda     = document.getElementById("buscar-pais");
-    var listaDropdown     = document.getElementById("lista-paises");
-    var campoPaisSeleccionado = document.getElementById("pais-seleccionado");
-    var inputPaisOculto   = document.getElementById("nacionalidad");
-
-    if (campoBusqueda === null || listaDropdown === null) {
-        return; // Los elementos no existen en esta página
-    }
-
-    // Función para renderizar los países en el dropdown
-    function renderizarDropdown(paisesFiltrados) {
-        listaDropdown.innerHTML = "";
-
-        if (paisesFiltrados.length === 0) {
-            var itemVacio = document.createElement("li");
-            itemVacio.className = "pais-item pais-vacio";
-            itemVacio.textContent = "No se encontraron países";
-            listaDropdown.appendChild(itemVacio);
-            return;
-        }
-
-        for (var pais of paisesFiltrados) {
-            var item = document.createElement("li");
-            item.className = "pais-item";
-            item.setAttribute("data-codigo", pais.codigo);
-            item.setAttribute("data-nombre", pais.nombre);
-            item.setAttribute("data-bandera", pais.bandera);
-            item.innerHTML = '<span class="pais-bandera">' + pais.bandera + "</span> " + pais.nombre;
-
-            // Evento click para seleccionar un país
-            item.addEventListener("click", function() {
-                var codigoPais  = this.getAttribute("data-codigo");
-                var nombrePais  = this.getAttribute("data-nombre");
-                var banderaPais = this.getAttribute("data-bandera");
-
-                campoBusqueda.value     = banderaPais + " " + nombrePais;
-                campoPaisSeleccionado.value = nombrePais;
-                inputPaisOculto.value = JSON.stringify({
-                    nombre:     nombrePais,
-                    codigoPais: codigoPais,
-                    bandera:    banderaPais
-                });
-
-                listaDropdown.classList.remove("dropdown-visible");
-            });
-
-            listaDropdown.appendChild(item);
-        }
-    }
-
-    // Mostrar todos los países al hacer focus en el campo
-    campoBusqueda.addEventListener("focus", function() {
-        renderizarDropdown(listaPaises);
-        listaDropdown.classList.add("dropdown-visible");
-    });
-
-    // Filtrar países mientras el usuario escribe
-    campoBusqueda.addEventListener("input", function() {
-        var textoBusqueda = this.value.toLowerCase().trim();
-        var paisesFiltrados = [];
-
-        for (var pais of listaPaises) {
-            if (pais.nombre.toLowerCase().includes(textoBusqueda)) {
-                paisesFiltrados.push(pais);
-            }
-        }
-
-        renderizarDropdown(paisesFiltrados);
-        listaDropdown.classList.add("dropdown-visible");
-    });
-
-    // Cerrar el dropdown al hacer clic fuera de él
-    document.addEventListener("click", function(evento) {
-        if (!campoBusqueda.contains(evento.target) && !listaDropdown.contains(evento.target)) {
-            listaDropdown.classList.remove("dropdown-visible");
-        }
-    });
-}
+var CIUDADES_CLIMA = {
+    "santo-domingo": { nombre: "Santo Domingo (Luz de América)", lat: -0.25, lon: -79.15 },
+    "sangolqui":     { nombre: "Sede Matriz (Quito - Sangolquí)",  lat: -0.31, lon: -78.44 }
+};
 
 // ──────────────────────────────────────────────
 // CARGAR CLIMA desde Open-Meteo
-// Actualiza el panel de clima en la página
+// Permite seleccionar la ciudad dinámicamente
 // ──────────────────────────────────────────────
-function cargarClima(idContenedor) {
+function cargarClima(idContenedor, claveCiudad) {
+    if (!claveCiudad || !CIUDADES_CLIMA[claveCiudad]) {
+        claveCiudad = "santo-domingo";
+    }
+
+    var ciudadObj = CIUDADES_CLIMA[claveCiudad];
+    var urlClimaCiudad = "https://api.open-meteo.com/v1/forecast" +
+        "?latitude=" + ciudadObj.lat + "&longitude=" + ciudadObj.lon +
+        "&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code" +
+        "&timezone=auto";
+
     var contenedor = document.getElementById(idContenedor);
     if (contenedor === null) {
         return;
     }
 
-    // Mostrar indicador de carga
     contenedor.innerHTML =
         '<div class="clima-cargando">' +
             '<i class="fas fa-spinner fa-spin"></i>' +
-            " Consultando el clima actual..." +
+            " Consultando el clima de " + ciudadObj.nombre + "..." +
         "</div>";
 
-    fetch(URL_CLIMA)
+    fetch(urlClimaCiudad)
         .then(function(respuesta) {
             if (!respuesta.ok) {
                 throw new Error("Error al consultar el clima. Código: " + respuesta.status);
@@ -190,8 +73,34 @@ function cargarClima(idContenedor) {
 
             var estadoClima  = ESTADOS_CLIMA[codigoClima] || { descripcion: "Variable", icono: "fa-cloud" };
 
+            // Construir opciones del selector de ciudades
+            var opcionesCiudad = "";
+            var clavesCiudades = Object.keys(CIUDADES_CLIMA);
+            for (var cKey of clavesCiudades) {
+                var selectedAttr = (cKey === claveCiudad) ? "selected" : "";
+                opcionesCiudad = opcionesCiudad + '<option value="' + cKey + '" ' + selectedAttr + '>' + CIUDADES_CLIMA[cKey].nombre + '</option>';
+            }
+
+            // Lógica de negocio: Recomendación de menú según el clima actual
+            var recomendacionMenu = "";
+            var esLluviaOFrio = (codigoClima >= 51 && codigoClima <= 95) || temperatura < 21;
+
+            if (esLluviaOFrio) {
+                recomendacionMenu = '<div class="clima-recomendacion clima-rec-frio">' +
+                    '<i class="fas fa-mug-hot"></i> <strong>Recomendación FastMenu:</strong> El clima está fresco/lluvioso (' + temperatura + '°C). ¡Te sugerimos un <em>Caldo de Gallina caliente</em> o un <em>Café pasado con tostada</em>!' +
+                    '</div>';
+            } else {
+                recomendacionMenu = '<div class="clima-recomendacion clima-rec-calor">' +
+                    '<i class="fas fa-ice-cream"></i> <strong>Recomendación FastMenu:</strong> ¡Hace buen clima en el campus (' + temperatura + '°C)! Te sugerimos acompañar tu almuerzo con una <em>Gaseosa Helada</em> o un <em>Helado de Paila</em>.' +
+                    '</div>';
+            }
+
             contenedor.innerHTML =
                 '<div class="clima-panel">' +
+                    '<div class="clima-selector-ciudad">' +
+                        '<label for="select-ciudad-' + idContenedor + '"><i class="fas fa-city"></i> Ciudad:</label>' +
+                        '<select id="select-ciudad-' + idContenedor + '">' + opcionesCiudad + '</select>' +
+                    '</div>' +
                     '<div class="clima-principal">' +
                         '<i class="fas ' + estadoClima.icono + ' clima-icono-grande"></i>' +
                         '<div class="clima-temperatura">' +
@@ -211,17 +120,26 @@ function cargarClima(idContenedor) {
                             "<strong>" + viento + " km/h</strong>" +
                         "</div>" +
                     "</div>" +
-                    '<p class="clima-ubicacion"><i class="fas fa-map-marker-alt"></i> Santo Domingo, Ecuador</p>' +
-                    '<button id="btn-actualizar-clima" class="btn-clima-actualizar">' +
-                        '<i class="fas fa-sync-alt"></i> Actualizar' +
+                    recomendacionMenu +
+                    '<p class="clima-ubicacion"><i class="fas fa-map-marker-alt"></i> ' + ciudadObj.nombre + ', Ecuador</p>' +
+                    '<button id="btn-actualizar-clima-' + idContenedor + '" class="btn-clima-actualizar">' +
+                        '<i class="fas fa-sync-alt"></i> Actualizar clima' +
                     "</button>" +
                 "</div>";
 
+            // Evento para cambiar de ciudad
+            var selectCiudadEl = document.getElementById("select-ciudad-" + idContenedor);
+            if (selectCiudadEl !== null) {
+                selectCiudadEl.addEventListener("change", function() {
+                    cargarClima(idContenedor, this.value);
+                });
+            }
+
             // Botón para actualizar el clima manualmente
-            var btnActualizar = document.getElementById("btn-actualizar-clima");
+            var btnActualizar = document.getElementById("btn-actualizar-clima-" + idContenedor);
             if (btnActualizar !== null) {
                 btnActualizar.addEventListener("click", function() {
-                    cargarClima(idContenedor);
+                    cargarClima(idContenedor, claveCiudad);
                 });
             }
         })
@@ -230,10 +148,17 @@ function cargarClima(idContenedor) {
             contenedor.innerHTML =
                 '<div class="clima-error">' +
                     '<i class="fas fa-exclamation-triangle"></i>' +
-                    "<p>No se pudo obtener el clima. Verifica tu conexión a internet.</p>" +
-                    '<button onclick="cargarClima(\'' + idContenedor + '\')" class="btn-clima-actualizar">' +
+                    "<p>No se pudo obtener el clima. Verifica tu conexión.</p>" +
+                    '<button id="btn-reintentar-clima-' + idContenedor + '" class="btn-clima-actualizar">' +
                         "Reintentar" +
                     "</button>" +
                 "</div>";
+
+            var btnReintentar = document.getElementById("btn-reintentar-clima-" + idContenedor);
+            if (btnReintentar !== null) {
+                btnReintentar.addEventListener("click", function() {
+                    cargarClima(idContenedor, claveCiudad);
+                });
+            }
         });
 }

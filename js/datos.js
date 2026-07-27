@@ -1,31 +1,68 @@
 /**
  * datos.js
  * Módulo encargado de cargar los archivos JSON mediante fetch.
- * Implementa la estrategia: primera carga desde JSON → guardar en localStorage.
- * Las siguientes visitas usan localStorage directamente.
+ * Implementa la estrategia: primera carga/actualización desde JSON → guardar en localStorage.
+ * Las siguientes visitas usan localStorage.
  */
 
+// Versión de los datos para forzar refresco del caché en localStorage cuando se actualiza el JSON
+var VERSION_DATOS = "10.0";
+
+// Determinar la ruta relativa correcta del directorio json/ dependiendo de la página actual
+var RUTA_BASE_JSON = (window.location.pathname.indexOf("/pages/") !== -1) ? "../json/" : "json/";
+
+// Determinar si la página está en el subdirectorio pages/
+var EN_SUBCARPETA_PAGES = (window.location.pathname.indexOf("/pages/") !== -1);
+
 // ──────────────────────────────────────────────
-// Rutas de los archivos JSON
-// Se usan rutas relativas desde la carpeta js/
-// Las páginas en pages/ necesitan "../json/"
+// Corregir la ruta de imagen del producto
+// Las imágenes en productos.json se guardan relativas a la raíz (ej: imagenes/menu/...)
+// Desde pages/ se debe agregar ../ al inicio si la ruta es local
 // ──────────────────────────────────────────────
-var RUTA_BASE_JSON = "../json/";
+function corregirRutaImagen(rutaImagen) {
+    if (!rutaImagen) {
+        return EN_SUBCARPETA_PAGES ? "../imagenes/logo/fastfood-logo.jpg" : "imagenes/logo/fastfood-logo.jpg";
+    }
+    // Si es una URL externa (http/https), se usa tal cual
+    if (rutaImagen.indexOf("http") === 0) {
+        return rutaImagen;
+    }
+    // Si ya comienza con ../ no se modifica
+    if (rutaImagen.indexOf("../") === 0) {
+        return rutaImagen;
+    }
+    // Si estamos en pages/, agregar prefijo ../
+    if (EN_SUBCARPETA_PAGES) {
+        return "../" + rutaImagen;
+    }
+    return rutaImagen;
+}
+
+// ──────────────────────────────────────────────
+// Verificar versión de datos en localStorage
+// ──────────────────────────────────────────────
+function verificarVersionDatos() {
+    var versionGuardada = localStorage.getItem("fastmenu_version_datos");
+    if (versionGuardada !== VERSION_DATOS) {
+        localStorage.removeItem(CLAVE_PRODUCTOS);
+        localStorage.removeItem(CLAVE_CATEGORIAS);
+        localStorage.setItem("fastmenu_version_datos", VERSION_DATOS);
+    }
+}
 
 // ──────────────────────────────────────────────
 // Cargar PRODUCTOS desde JSON o localStorage
 // Retorna una promesa con el arreglo de productos
 // ──────────────────────────────────────────────
 function cargarProductos() {
-    // Verificamos si ya hay datos en el navegador
+    verificarVersionDatos();
+
     var productosGuardados = obtenerDeStorage(CLAVE_PRODUCTOS);
 
-    if (productosGuardados !== null && productosGuardados.length > 0) {
-        // Ya tenemos datos en localStorage, los devolvemos directamente
+    if (productosGuardados !== null && productosGuardados.length >= 40) {
         return Promise.resolve(productosGuardados);
     }
 
-    // Primera carga: traemos el JSON del servidor
     return fetch(RUTA_BASE_JSON + "productos.json")
         .then(function(respuesta) {
             if (!respuesta.ok) {
@@ -34,12 +71,11 @@ function cargarProductos() {
             return respuesta.json();
         })
         .then(function(productos) {
-            // Guardamos en localStorage para las próximas visitas
             guardarEnStorage(CLAVE_PRODUCTOS, productos);
             return productos;
         })
         .catch(function(error) {
-            console.error("Error al cargar productos:", error);
+            console.error("Error al cargar productos desde " + RUTA_BASE_JSON + "productos.json:", error);
             throw error;
         });
 }
@@ -48,9 +84,11 @@ function cargarProductos() {
 // Cargar CATEGORÍAS desde JSON o localStorage
 // ──────────────────────────────────────────────
 function cargarCategorias() {
+    verificarVersionDatos();
+
     var categoriasGuardadas = obtenerDeStorage(CLAVE_CATEGORIAS);
 
-    if (categoriasGuardadas !== null && categoriasGuardadas.length > 0) {
+    if (categoriasGuardadas !== null && categoriasGuardadas.length >= 6) {
         return Promise.resolve(categoriasGuardadas);
     }
 
@@ -77,7 +115,7 @@ function cargarCategorias() {
 function cargarUsuarios() {
     var usuariosGuardados = obtenerDeStorage(CLAVE_USUARIOS);
 
-    if (usuariosGuardados !== null && usuariosGuardados.length > 0) {
+    if (usuariosGuardados !== null && usuariosGuardados.length >= 50) {
         return Promise.resolve(usuariosGuardados);
     }
 
@@ -94,6 +132,43 @@ function cargarUsuarios() {
         })
         .catch(function(error) {
             console.error("Error al cargar usuarios:", error);
+            throw error;
+        });
+}
+
+// ──────────────────────────────────────────────
+// Cargar productos directamente desde la API externa DummyJSON
+// ──────────────────────────────────────────────
+function cargarProductosDesdeDummyJSON() {
+    return fetch("https://dummyjson.com/products?limit=12")
+        .then(function(respuesta) {
+            if (!respuesta.ok) {
+                throw new Error("Error HTTP al consultar DummyJSON: " + respuesta.status);
+            }
+            return respuesta.json();
+        })
+        .then(function(datos) {
+            var productosAPI = [];
+            var items = datos.products || [];
+
+            for (var p of items) {
+                productosAPI.push({
+                    id: 1000 + p.id,
+                    nombre: p.title,
+                    descripcion: p.description || "Producto de tienda universitaria",
+                    precio: p.price,
+                    categoriaId: 4, // Categoría Combos/General
+                    stock: p.stock || 10,
+                    imagen: p.thumbnail || (p.images ? p.images[0] : "../imagenes/logo/fastfood-logo.jpg"),
+                    estado: "disponible",
+                    fechaRegistro: new Date().toISOString().split("T")[0]
+                });
+            }
+
+            return productosAPI;
+        })
+        .catch(function(error) {
+            console.error("Error al consumir DummyJSON:", error);
             throw error;
         });
 }
@@ -144,7 +219,7 @@ function obtenerCategoria(categoriaId, listaCategorias) {
 // Busca el ID más alto y le suma 1
 // ──────────────────────────────────────────────
 function generarNuevoId(arreglo) {
-    if (arreglo.length === 0) {
+    if (!arreglo || arreglo.length === 0) {
         return 1;
     }
     var idMaximo = 0;

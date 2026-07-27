@@ -172,6 +172,10 @@ function validarFormularioRegistro(datos) {
         errores.push({ campo: "password", mensaje: "La contraseña debe tener entre 8 y 16 caracteres." });
     }
 
+    if (!contrasenasCoinciden(datos.password, datos.confirmPassword)) {
+        errores.push({ campo: "confirm_password", mensaje: "Las contraseñas no coinciden." });
+    }
+
     if (campoEstaVacio(datos.fechaNacimiento)) {
         errores.push({ campo: "fecha_nacimiento", mensaje: "La fecha de nacimiento es obligatoria." });
     }

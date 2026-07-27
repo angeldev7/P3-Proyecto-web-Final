@@ -4,7 +4,7 @@
     "nombre": "Almuerzos",
     "icono": "fas fa-bowl-rice",
     "descripcion": "Platos fuertes preparados al instante con ingredientes frescos.",
-    "color": "#e74c3c"
+    "color": "#8b0000"
   },
   {
     "id": 2,
@@ -26,5 +26,19 @@
     "icono": "fas fa-star",
     "descripcion": "Combinaciones especiales con descuento para estudiantes.",
     "color": "#27ae60"
+  },
+  {
+    "id": 5,
+    "nombre": "Desayunos",
+    "icono": "fas fa-egg",
+    "descripcion": "Opciones nutritivas para empezar bien la mañana.",
+    "color": "#d35400"
+  },
+  {
+    "id": 6,
+    "nombre": "Postres",
+    "icono": "fas fa-ice-cream",
+    "descripcion": "Dulces y aperitivos deliciosos para cerrar con broche de oro.",
+    "color": "#8e44ad"
   }
 ]

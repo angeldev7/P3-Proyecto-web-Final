@@ -63,17 +63,19 @@
                         </select>
                     </p>
 
-                    <!-- Selector de nacionalidad con API de países -->
-                    <p class="full-width selector-pais-contenedor">
-                        <label for="buscar-pais">Nacionalidad: <span class="obligatorio">*</span></label>
-                        <input type="text" id="buscar-pais" autocomplete="off"
-                            placeholder="Cargando países..." aria-label="Buscar país de nacionalidad">
-                        <!-- Lista desplegable de países (se llena con JS) -->
-                        <ul id="lista-paises" class="lista-paises-dropdown" role="listbox"></ul>
-                        <!-- Campo oculto que guarda el país seleccionado como texto -->
-                        <input type="hidden" id="pais-seleccionado" name="pais-seleccionado">
-                        <!-- Campo oculto con el objeto completo en JSON -->
-                        <input type="hidden" id="nacionalidad" name="nacionalidad">
+                    <!-- Selector de nacionalidad -->
+                    <p class="full-width">
+                        <label for="nacionalidad">Nacionalidad: <span class="obligatorio">*</span></label>
+                        <select id="nacionalidad" name="nacionalidad" required>
+                            <option value="🇪🇨 Ecuador">🇪🇨 Ecuador</option>
+                            <option value="🇨🇴 Colombia">🇨🇴 Colombia</option>
+                            <option value="🇵🇪 Perú">🇵🇪 Perú</option>
+                            <option value="🇻🇪 Venezuela">🇻🇪 Venezuela</option>
+                            <option value="🇦🇷 Argentina">🇦🇷 Argentina</option>
+                            <option value="🇨🇱 Chile">🇨🇱 Chile</option>
+                            <option value="🇪🇸 España">🇪🇸 España</option>
+                            <option value="🌎 Otra">🌎 Otra</option>
+                        </select>
                     </p>
                 </fieldset>
 
@@ -87,6 +89,11 @@
                         <label for="password">Contraseña: <span class="obligatorio">*</span></label>
                         <input type="password" id="password" name="password" minlength="8" maxlength="16" required
                             placeholder="Mínimo 8 caracteres">
+                    </p>
+                    <p class="full-width">
+                        <label for="confirm_password">Confirmar Contraseña: <span class="obligatorio">*</span></label>
+                        <input type="password" id="confirm_password" name="confirm_password" minlength="8" maxlength="16" required
+                            placeholder="Repite tu contraseña">
                     </p>
                     <p class="full-width terms-field">
                         <label>

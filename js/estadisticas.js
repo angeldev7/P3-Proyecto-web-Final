@@ -11,56 +11,57 @@ var graficoProductos = null;
 // Calcular y mostrar el PANEL DE INDICADORES
 // ──────────────────────────────────────────────
 function actualizarPanelIndicadores(productos, listaCategorias) {
+    if (!productos || productos.length === 0) {
+        return;
+    }
+
     // Total de productos registrados
     var totalProductos = productos.length;
 
-    // Total de categorías que tienen al menos un producto
-    var categoriasConProductos = new Set();
-    for (var producto of productos) {
-        categoriasConProductos.add(producto.categoriaId);
-    }
-    var totalCategorias = categoriasConProductos.size;
+    // Total de categorías usando map() y Set()
+    var categoriasIds = productos.map(function(p) { return p.categoriaId; });
+    var totalCategorias = new Set(categoriasIds).size;
 
-    // Productos disponibles y agotados
-    var disponibles = 0;
-    var agotados    = 0;
-    for (var prod of productos) {
-        if (prod.estado === "disponible" && prod.stock > 0) {
-            disponibles++;
-        } else {
-            agotados++;
-        }
-    }
+    // Productos disponibles usando filter()
+    var listaDisponibles = productos.filter(function(p) {
+        return p.estado === "disponible" && p.stock > 0;
+    });
+    var disponibles = listaDisponibles.length;
 
-    // Precio promedio del menú
-    var sumaPrecios = 0;
-    for (var p of productos) {
-        sumaPrecios = sumaPrecios + p.precio;
-    }
+    // Productos agotados usando filter()
+    var listaAgotados = productos.filter(function(p) {
+        return p.estado === "agotado" || p.stock === 0;
+    });
+    var agotados = listaAgotados.length;
+
+    // Precio promedio del menú usando reduce()
+    var sumaPrecios = productos.reduce(function(acumulador, p) {
+        return acumulador + p.precio;
+    }, 0);
     var precioPromedio = (sumaPrecios / productos.length).toFixed(2);
 
-    // Producto más caro
-    var masCaro = productos[0];
-    for (var item of productos) {
-        if (item.precio > masCaro.precio) {
-            masCaro = item;
-        }
-    }
+    // Producto más caro usando reduce()
+    var masCaro = productos.reduce(function(max, p) {
+        return (p.precio > max.precio) ? p : max;
+    }, productos[0]);
 
-    // Producto más barato
-    var masBarato = productos[0];
-    for (var item2 of productos) {
-        if (item2.precio < masBarato.precio) {
-            masBarato = item2;
-        }
-    }
+    // Producto más barato usando reduce()
+    var masBarato = productos.reduce(function(min, p) {
+        return (p.precio < min.precio) ? p : min;
+    }, productos[0]);
 
-    // Total de usuarios registrados
+    // Verificación con some(): ¿Hay productos agotados?
+    var hayAgotados = productos.some(function(p) { return p.stock === 0; });
+
+    // Verificación con every(): ¿Todos tienen precio válido?
+    var todosPreciosValidos = productos.every(function(p) { return p.precio > 0; });
+
+    // Búsqueda con find(): Ejemplo de producto disponible
+    var primerDisponible = productos.find(function(p) { return p.stock > 0; });
+
+    // Total de usuarios registrados en localStorage
     var usuariosGuardados = obtenerDeStorage(CLAVE_USUARIOS);
-    var totalUsuarios = 0;
-    if (usuariosGuardados !== null) {
-        totalUsuarios = usuariosGuardados.length;
-    }
+    var totalUsuarios = (usuariosGuardados !== null) ? usuariosGuardados.length : 0;
 
     // Total items en el carrito actual
     var totalCarrito = contarItemsCarrito();
@@ -123,16 +124,20 @@ function actualizarGrafico(productos, listaCategorias) {
     var valores   = Object.values(conteo);
 
     var coloresFondos = [
-        "rgba(231, 76, 60, 0.8)",   // Rojo — Almuerzos
-        "rgba(41, 128, 185, 0.8)",  // Azul — Bebidas
-        "rgba(243, 156, 18, 0.8)",  // Naranja — Snacks
-        "rgba(39, 174, 96, 0.8)"    // Verde — Combos
+        "rgba(231, 76, 60, 0.85)",   // Rojo — Almuerzos
+        "rgba(41, 128, 185, 0.85)",  // Azul — Bebidas
+        "rgba(243, 156, 18, 0.85)",  // Naranja — Snacks
+        "rgba(39, 174, 96, 0.85)",   // Verde — Combos
+        "rgba(211, 84, 0, 0.85)",    // Naranja Oscuro — Desayunos
+        "rgba(142, 68, 173, 0.85)"   // Púrpura — Postres
     ];
     var coloresBorde = [
         "rgba(231, 76, 60, 1)",
         "rgba(41, 128, 185, 1)",
         "rgba(243, 156, 18, 1)",
-        "rgba(39, 174, 96, 1)"
+        "rgba(39, 174, 96, 1)",
+        "rgba(211, 84, 0, 1)",
+        "rgba(142, 68, 173, 1)"
     ];
 
     // Si ya existe un gráfico, lo destruimos antes de crear uno nuevo
@@ -161,16 +166,16 @@ function actualizarGrafico(productos, listaCategorias) {
                 legend: {
                     position: "bottom",
                     labels: {
-                        color:    "#ecf0f1",
-                        font:     { size: 13, family: "'Inter', sans-serif" },
+                        color:    "#333333",
+                        font:     { size: 13, weight: "bold", family: "'Inter', sans-serif" },
                         padding:  16
                     }
                 },
                 title: {
                     display: true,
                     text:    "Distribución de productos por categoría",
-                    color:   "#ecf0f1",
-                    font:    { size: 15, family: "'Inter', sans-serif" }
+                    color:   "#8b0000",
+                    font:    { size: 16, weight: "bold", family: "'Inter', sans-serif" }
                 },
                 tooltip: {
                     callbacks: {

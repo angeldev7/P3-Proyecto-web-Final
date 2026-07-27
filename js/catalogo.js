@@ -27,6 +27,20 @@ function inicializarCatalogo() {
         return;
     }
 
+    // Control de acceso: Verificar si el usuario activo es Administrador
+    if (!esUsuarioAdministrador()) {
+        Swal.fire({
+            title: "Acceso Restringido",
+            text: "La administración del catálogo es exclusiva para cuentas con rol de Administrador (ej: admin@espe.edu.ec).",
+            icon: "warning",
+            confirmButtonText: "Entendido",
+            confirmButtonColor: "#8b0000"
+        }).then(function() {
+            window.location.href = "principal.html";
+        });
+        return;
+    }
+
     mostrarIndicadorCarga(contenedor, "Cargando catálogo de productos...");
 
     var promesaCategorias = cargarCategorias();
