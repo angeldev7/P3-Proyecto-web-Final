@@ -1,9 +1,13 @@
 /**
  * pedido.js
  * Lógica de la página de pedido (carrito de compras).
- * Carga el carrito desde localStorage, muestra el resumen
+ * Carga el carrito desde localStorage, muestra el resumen,
+ * gestiona la barra de progreso dinámica del estado del pedido
  * y permite confirmar o eliminar items.
  */
+
+// Variable global para controlar el intervalo del progreso
+var intervaloProgresoPedido = null;
 
 // ──────────────────────────────────────────────
 // Punto de entrada: esperar a que el DOM esté listo
@@ -18,6 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
 function inicializarPaginaPedido() {
     renderizarCarrito();
     activarEventosPedido();
+    actualizarEstadoPedidoDinamico();
 }
 
 // ──────────────────────────────────────────────
@@ -35,6 +40,9 @@ function renderizarCarrito() {
     if (cuerpTabla === null) {
         return;
     }
+
+    // Limpiar filas anteriores de la tabla antes de renderizar
+    cuerpTabla.innerHTML = "";
 
     // Mantener la sección principal visible
     if (seccionResumen !== null) {
@@ -113,6 +121,120 @@ function renderizarCarrito() {
 
     // Actualizar el contador de la navbar
     actualizarContadorCarrito();
+}
+
+// ──────────────────────────────────────────────
+// BARRA DE PROGRESO DINÁMICA DEL ESTADO DEL PEDIDO
+// ──────────────────────────────────────────────
+function actualizarEstadoPedidoDinamico() {
+    var elemTitulo    = document.getElementById("estado-pedido-titulo");
+    var elemTiempo    = document.getElementById("estado-pedido-tiempo");
+    var elemBarra     = document.getElementById("barra-progreso-pedido");
+    var elemTextoProg = document.getElementById("texto-porcentaje-pedido");
+
+    if (elemBarra === null) {
+        return;
+    }
+
+    var pedidoActivo = obtenerDeStorage(CLAVE_PEDIDO_ACTIVO);
+
+    // Caso 1: NO hay pedido activo (Estado de espera)
+    if (pedidoActivo === null) {
+        if (elemTitulo !== null)    elemTitulo.textContent = "Sin pedidos activos";
+        if (elemTiempo !== null)    elemTiempo.textContent = "(Agrega productos al carrito y confirma tu compra)";
+        if (elemTextoProg !== null) elemTextoProg.textContent = "0% completado — En espera de pedido";
+
+        elemBarra.style.width = "0%";
+        elemBarra.setAttribute("aria-valuenow", "0");
+        elemBarra.textContent = "0%";
+        elemBarra.className = "progress-bar progress-bar-striped progress-bar-animated bg-secondary";
+
+        if (intervaloProgresoPedido !== null) {
+            clearInterval(intervaloProgresoPedido);
+            intervaloProgresoPedido = null;
+        }
+        return;
+    }
+
+    // Caso 2: SI HAY UN PEDIDO ACTIVO
+    var porcentaje = pedidoActivo.porcentaje || 10;
+    var total      = pedidoActivo.total || "0.00";
+
+    function aplicarProgreso(pct) {
+        var tituloFase = "";
+        var tiempoFase = "";
+        var claseColor = "";
+
+        if (pct <= 0) {
+            tituloFase = "Sin pedidos activos";
+            tiempoFase = "(Agrega productos al carrito y confirma tu compra)";
+            claseColor = "bg-secondary";
+        } else if (pct < 25) {
+            tituloFase = "¡Pedido recibido! Enviando orden a cocina...";
+            tiempoFase = "(Tiempo estimado: 15-20 minutos | Total: $" + total + ")";
+            claseColor = "bg-info text-dark";
+        } else if (pct < 65) {
+            tituloFase = "Preparando tu pedido en cocina...";
+            tiempoFase = "(Cocinando platillos | Total: $" + total + ")";
+            claseColor = "bg-primary";
+        } else if (pct < 100) {
+            tituloFase = "Empacando y enviando a garita...";
+            tiempoFase = "(En camino al punto de retiro en garita principal)";
+            claseColor = "bg-warning text-dark";
+        } else {
+            tituloFase = "¡Pedido listo para retirar!";
+            tiempoFase = "(Acércate a la garita principal con tu pago de $" + total + ")";
+            claseColor = "bg-success";
+        }
+
+        if (elemTitulo !== null)    elemTitulo.textContent = tituloFase;
+        if (elemTiempo !== null)    elemTiempo.textContent = tiempoFase;
+        if (elemTextoProg !== null) elemTextoProg.textContent = pct + "% completado";
+
+        elemBarra.style.width = pct + "%";
+        elemBarra.setAttribute("aria-valuenow", pct);
+        elemBarra.textContent = pct + "%";
+        elemBarra.className = "progress-bar progress-bar-striped progress-bar-animated " + claseColor;
+    }
+
+    aplicarProgreso(porcentaje);
+
+    // Si ya llegó al 100%, detener
+    if (porcentaje >= 100) {
+        if (intervaloProgresoPedido !== null) {
+            clearInterval(intervaloProgresoPedido);
+            intervaloProgresoPedido = null;
+        }
+        return;
+    }
+
+    // Avanzar dinámicamente el porcentaje
+    if (intervaloProgresoPedido === null) {
+        intervaloProgresoPedido = setInterval(function() {
+            var pedidoActual = obtenerDeStorage(CLAVE_PEDIDO_ACTIVO);
+            if (pedidoActual === null) {
+                clearInterval(intervaloProgresoPedido);
+                intervaloProgresoPedido = null;
+                return;
+            }
+
+            var nuevoPorcentaje = (pedidoActual.porcentaje || 10) + 5;
+
+            if (nuevoPorcentaje >= 100) {
+                nuevoPorcentaje = 100;
+                clearInterval(intervaloProgresoPedido);
+                intervaloProgresoPedido = null;
+
+                if (typeof mostrarNotificacion === "function") {
+                    mostrarNotificacion("¡Tu pedido está listo en la garita principal!", "exito");
+                }
+            }
+
+            pedidoActual.porcentaje = nuevoPorcentaje;
+            guardarEnStorage(CLAVE_PEDIDO_ACTIVO, pedidoActual);
+            aplicarProgreso(nuevoPorcentaje);
+        }, 2000);
+    }
 }
 
 // ──────────────────────────────────────────────
@@ -217,17 +339,29 @@ function manejarConfirmacionPago() {
         cancelButtonText:   "Cancelar"
     }).then(function(resultado) {
         if (resultado.isConfirmed) {
+            // Guardar nuevo pedido activo para la barra dinámica
+            var nuevoPedido = {
+                id: Date.now(),
+                total: totalPagar,
+                porcentaje: 10,
+                fechaInicio: new Date().toISOString()
+            };
+            guardarEnStorage(CLAVE_PEDIDO_ACTIVO, nuevoPedido);
+
             // Vaciar el carrito después de confirmar
             vaciarCarrito();
             renderizarCarrito();
+
+            // Iniciar la barra de progreso inmediatamente
+            actualizarEstadoPedidoDinamico();
 
             Swal.fire({
                 icon:              "success",
                 title:             "¡Pedido confirmado!",
                 html:
                     "<p>Tu pedido por <strong>$" + totalPagar + "</strong> ha sido registrado.</p>" +
-                    "<p>Acércate a la garita principal en <strong>15-20 minutos</strong>.</p>" +
-                    "<p>Lleva efectivo para el pago al retirar.</p>",
+                    "<p>Puedes seguir el avance en la barra de estado en tiempo real.</p>" +
+                    "<p>Acércate a la garita principal cuando llegue al 100%.</p>",
                 confirmButtonText:  "Entendido",
                 confirmButtonColor: "#e74c3c"
             });

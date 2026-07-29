@@ -12,6 +12,7 @@ var CLAVE_CATEGORIAS = "fastmenu_categorias";
 var CLAVE_USUARIOS   = "fastmenu_usuarios";
 var CLAVE_CARRITO    = "fastmenu_carrito";
 var CLAVE_USUARIO_ACTIVO = "fastmenu_usuario_activo";
+var CLAVE_PEDIDO_ACTIVO  = "fastmenu_pedido_activo";
 
 // ──────────────────────────────────────────────
 // GUARDAR un arreglo completo en localStorage

@@ -124,15 +124,17 @@
             <div class="pedido-col-right">
                 <section id="estado-pedido">
                     <h2>Estado de tu pedido actual</h2>
-                    <p>Preparando envío... <br>
-                        <span class="nota-tiempo">(Tiempo estimado: 15-20 minutos)</span>
+                    <p id="estado-pedido-mensaje">
+                        <span id="estado-pedido-titulo" class="fw-bold">Sin pedidos activos</span><br>
+                        <span class="nota-tiempo" id="estado-pedido-tiempo">(Agrega productos al carrito y confirma tu compra)</span>
                     </p>
-                    <div class="progress my-4">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-danger"
-                            role="progressbar" style="width: 65%;" aria-valuenow="65"
-                            aria-valuemin="0" aria-valuemax="100">65%</div>
+                    <div class="progress my-4" style="height: 24px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-secondary"
+                            id="barra-progreso-pedido"
+                            role="progressbar" style="width: 0%;" aria-valuenow="0"
+                            aria-valuemin="0" aria-valuemax="100">0%</div>
                     </div>
-                    <p class="progreso-texto">65% completado</p>
+                    <p class="progreso-texto" id="texto-porcentaje-pedido">0% completado</p>
                 </section>
 
                 <section id="punto-retiro">
